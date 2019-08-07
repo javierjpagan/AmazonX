@@ -59,8 +59,24 @@ function purchase() {
             if(res.length === 0){
                 console.log("Sorry, you selected an item that is not in our inventory. Please try again.");
                 return purchase();
-            }
+            };
+            
+            if( parseInt(answer.amount) > parseInt(res[0].stock_quantity)) {
+                console.log("Sorry, you selected an amount greater then what is in our inventory. Please try again.");
+                return purchase();
+            };
+
+            var newQuantity = parseInt(res[0].stock_quantity) - parseInt(answer.amount);
+            var cost = parseFloat(res[0].price) * parseInt(answer.amount);
+
+            connection.query("UPDATE products SET stock_quantity = ? WHERE item_id = ?", [ newQuantity, answer.item_id], function (err, res) {
+                if (err) throw err;
+
+                console.log(`Thank you for your purchanse.  Your total is $${cost}.`);
+                connection.end();
+            })
         })
         
     })
 }
+
